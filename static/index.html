@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cricket Auction System</title>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+/* ===== GLOBAL ===== */
+body {
+    background: radial-gradient(circle at top, #1b1f3b, #0d1026);
+    color: #eaeaff;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+h1, h3, h4, h5 {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* ===== NAV BUTTONS ===== */
+button.btn {
+    border-radius: 30px;
+    padding: 8px 18px;
+    font-weight: 600;
+}
+
+/* ===== SECTIONS ===== */
+.section {
+    border-radius: 18px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+}
+
+/* ===== LIVE AUCTION ===== */
+#live {
+    background: linear-gradient(135deg, #2b2f6f, #1c1f4a);
+}
+
+#live b {
+    color: #fff;
+}
+
+/* ===== FORMS ===== */
+input, select {
+    background: #1a1e3a !important;
+    border: 1px solid #30366a !important;
+    color: #fff !important;
+    border-radius: 12px !important;
+}
+
+input::placeholder {
+    color: #9aa0d4;
+}
+
+/* ===== PLAYER CARDS ===== */
+.player-card {
+    background: linear-gradient(180deg, #1e234b, #15183a);
+    border-radius: 18px;
+    border: 1px solid #2e3575;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    overflow: hidden;
+}
+
+.player-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+}
+
+.player-card img {
+    height: 190px;
+    object-fit: cover;
+}
+
+.player-card .card-body {
+    text-align: center;
+    padding: 14px;
+}
+
+.player-card h6 {
+    color: #ffffff;
+    font-weight: 700;
+    margin: 8px 0 2px;
+}
+
+.player-card small {
+    color: #b5b9ff;
+    font-size: 0.8rem;
+}
+
+/* ===== BADGES ===== */
+.badge {
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 0.7rem;
+    letter-spacing: 0.4px;
+}
+
+/* ===== DASHBOARDS ===== */
+#teamDashboard, #adminDashboard {
+    background: linear-gradient(160deg, #1f255c, #14183f);
+}
+
+/* ===== LISTS ===== */
+ul {
+    padding-left: 18px;
+}
+li {
+    margin-bottom: 6px;
+    color: #dfe1ff;
+}
+
+/* ===== ADMIN BUTTONS ===== */
+#adminDashboard button {
+    font-weight: 600;
+}
+
+/* ===== SCROLL BAR ===== */
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-thumb {
+    background: #4a4fd8;
+    border-radius: 10px;
+}
+/* ===== LIVE BID GLOW ===== */
+@keyframes pulseGlow {
+    0% {
+        box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(0, 255, 255, 0.9);
+    }
+    100% {
+        box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+    }
+}
+
+.glow {
+    animation: pulseGlow 1.2s ease-in-out;
+}
+/* ===== SOLD STAMP ===== */
+.sold-stamp {
+    position: absolute;
+    top: 35%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-15deg);
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: rgba(255, 0, 0, 0.9);
+    border: 4px solid rgba(255, 0, 0, 0.9);
+    padding: 6px 18px;
+    text-transform: uppercase;
+    animation: stamp 0.5s ease-out;
+}
+
+@keyframes stamp {
+    0% {
+        transform: translate(-50%, -50%) scale(2) rotate(-15deg);
+        opacity: 0;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1) rotate(-15deg);
+        opacity: 1;
+    }
+}
+
+/* ===== AUCTION TIMER ===== */
+#auctionTimer {
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+.timer-danger {
+    color: #ff4d4d !important;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    50% { opacity: 0.4; }
+}
+
+.leading-team {
+    color: #00ffcc;
+    font-weight: bold;
+    animation: glow 1s infinite alternate;
+}
+
+@keyframes glow {
+    from { text-shadow: 0 0 5px #00ffcc; }
+    to { text-shadow: 0 0 15px #00ffcc; }
+}
+
+/* ===== WELCOME ANIMATION ===== */
+#welcome {
+    animation: welcomeIn 1.1s ease forwards;
+}
+
+@keyframes welcomeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ===== EXIT ANIMATION ===== */
+.welcome-exit {
+    animation: welcomeOut 0.6s ease forwards;
+}
+
+@keyframes welcomeOut {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.08);
+    }
+}
+
+/* ===== ENTER BUTTON GLOW ===== */
+.enter-btn {
+    position: relative;
+    box-shadow: 0 0 15px rgba(0,255,204,0.6);
+    animation: enterGlow 1.6s infinite alternate;
+}
+
+@keyframes enterGlow {
+    from {
+        box-shadow: 0 0 12px rgba(0,255,204,0.5);
+    }
+    to {
+        box-shadow: 0 0 28px rgba(0,255,204,1);
+    }
+}
+/* ===== FIX WHITE CONTAINER ISSUE ===== */
+.container {
+    background: transparent !important;
+}
+
+.card {
+    background-color: transparent;
+}
+
+/* ===== WELCOME CARD OVERRIDE ===== */
+#welcome {
+    background: linear-gradient(
+        160deg,
+        #1f255c,
+        #14183f
+    ) !important;
+
+    color: #eaeaff;
+    border: 1px solid #3b41a3;
+}
+
+</style>
+</head>
+
+<body class="bg-dark text-white">
+<div class="container mt-4">
+<!-- ================= WELCOME PAGE ================= -->
+<div id="welcome" class="section card p-4 mb-4">
+    <h2 class="text-center mb-3">🏏 Cricket Auction System</h2>
+
+    <p class="text-center text-info">
+        Welcome! Please read the rules before entering.
+    </p>
+
+    <hr>
+
+    <h5>📜 Rules</h5>
+    <ul>
+        <li>Only approved players can be auctioned</li>
+        <li>Each team has a fixed budget</li>
+        <li>Highest bid within time wins the player</li>
+        <li>Unsold players go to Re-Auction</li>
+    </ul>
+
+    <h5 class="mt-3">👥 Roles</h5>
+    <ul>
+        <li><b>Players:</b> Register & wait for approval</li>
+        <li><b>Teams:</b> Login and bid</li>
+        <li><b>Admin:</b> Full auction control</li>
+    </ul>
+
+    <div class="text-center mt-4">
+        <button class="btn btn-success btn-lg px-5 enter-btn" onclick="enterAuction()">
+            🚀 Enter Auction System
+        </button>
+    </div>
+</div>
+
+
+
+<div id="app" class="d-none">
+    <h1 class="text-center mb-4">🏏 Cricket Auction System</h1>
+
+<!-- ================= NAV ================= -->
+<div class="text-center mb-4">
+    <button class="btn btn-outline-light m-1" onclick="show('live')">Watch Live</button>
+    <button class="btn btn-outline-light m-1" onclick="show('players')">Players</button>
+    <button id="registerNav" class="btn btn-outline-primary m-1" onclick="show('register')">Player Registration</button>
+    <button class="btn btn-outline-info m-1" onclick="show('teamLogin')">Team Login</button>
+    <button class="btn btn-outline-warning m-1" onclick="show('adminLogin')">Admin</button>
+</div>
+
+
+<!-- ================= LIVE ================= -->
+<div id="live" class="section card bg-secondary p-3">
+    <h3>📺 Live Auction</h3>
+    <p>Player: <b id="livePlayer">Waiting for admin...</b></p>
+    <p>Highest Bid: ₹<b id="liveBid">-</b></p>
+    <p>
+    ⏱️ Time Left:
+    <b id="auctionTimer" class="text-warning">--</b> sec
+</p>
+    <p>Leading Team: <b id="liveTeam">-</b></p>
+</div>
+</div> <!-- end container -->
+
+<!-- ================= PLAYER REGISTRATION ================= -->
+<div id="register" class="section card bg-dark border-primary p-3 d-none">
+    <h3>📝 Player Registration</h3>
+
+    <input id="r_name" class="form-control mb-2" placeholder="Full Name">
+    <select id="r_role" class="form-select mb-2">
+        <option>Batsman</option>
+        <option>Bowler</option>
+        <option>All-Rounder</option>
+    </select>
+    <select id="r_category" class="form-select mb-2">
+        <option>Student</option>
+        <option>Faculty</option>
+        <option>Alumni</option>
+    </select>
+    <input id="r_price" type="number" class="form-control mb-2" placeholder="Base Price">
+    <input id="r_photo" type="file" class="form-control mb-2">
+    <button class="btn btn-primary w-100" onclick="registerPlayer()">Register</button>
+    <p id="regMsg" class="mt-2"></p>
+</div>
+
+<!-- ================= PLAYERS ================= -->
+<div id="players" class="section card bg-dark border-info p-3 d-none">
+    <h3>🧑‍🏏 Players</h3>
+
+    <div class="row mb-3">
+        <div class="col">
+            <select id="filterRole" class="form-select" onchange="loadPlayers()">
+                <option value="">All Roles</option>
+                <option>Batsman</option>
+                <option>Bowler</option>
+                <option>All-Rounder</option>
+            </select>
+        </div>
+        <div class="col">
+            <select id="filterCategory" class="form-select" onchange="loadPlayers()">
+                <option value="">All Categories</option>
+                <option>Student</option>
+                <option>Faculty</option>
+                <option>Alumni</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="playerList" class="row"></div>
+</div>
+
+<!-- ================= TEAM LOGIN ================= -->
+<div id="teamLogin" class="section card bg-dark border-info p-3 d-none">
+    <h3>🏏 Team Login</h3>
+    <input id="teamUser" class="form-control mb-2" placeholder="Username">
+    <input id="teamPass" type="password" class="form-control mb-2" placeholder="Password">
+    <button class="btn btn-info w-100" onclick="teamLogin()">Login</button>
+    <p id="teamMsg"></p>
+</div>
+
+<!-- ================= TEAM DASHBOARD ================= -->
+<div id="teamDashboard" class="section card bg-dark border-success p-3 d-none">
+    <h3>📊 Team Dashboard</h3>
+    <p><b>Team:</b> <span id="dashTeam"></span></p>
+    <p><b>Remaining Budget:</b> ₹<span id="dashBudget"></span></p>
+
+    <h5>🧑‍🏏 Players Bought</h5>
+    <ul id="dashPlayers"></ul>
+
+    <h5 class="mt-3">💰 Place Bid</h5>
+    <input id="bidAmount" type="number" class="form-control mb-2" placeholder="Bid Amount">
+    <button class="btn btn-info w-100" onclick="placeBid()">Place Bid</button>
+
+    <button class="btn btn-outline-light w-100 mt-3" onclick="teamLogout()">Logout</button>
+</div>
+
+<!-- ================= ADMIN LOGIN ================= -->
+<div id="adminLogin" class="section card bg-dark border-warning p-3 d-none">
+    <h3>👑 Admin Login</h3>
+    <input id="adminUser" class="form-control mb-2" placeholder="Username">
+    <input id="adminPass" type="password" class="form-control mb-2" placeholder="Password">
+    <button class="btn btn-warning w-100" onclick="adminLogin()">Login</button>
+</div>
+
+<!-- ================= ADMIN DASHBOARD ================= -->
+<div id="adminDashboard" class="section card bg-dark border-success p-3 d-none">
+    <h3>👑 Admin Dashboard</h3>
+
+    <button class="btn btn-warning w-100 mb-2" onclick="show('approvePlayers')">Approve Players</button>
+    <button class="btn btn-info w-100 mb-2" onclick="show('reauction')">Re-Auction</button>
+    <button class="btn btn-primary w-100 mb-2" onclick="show('createTeam')">Create Team</button>
+
+    <hr>
+    <button class="btn btn-success w-100 mb-2" onclick="startAuction()">Start Auction</button>
+    <input id="adminPlayerName" class="form-control mb-2" placeholder="Player Name">
+    <button class="btn btn-primary w-100 mb-2" onclick="setPlayerAdmin()">Set Player</button>
+    <button class="btn btn-danger w-100 mb-2" onclick="sellPlayer()">Sell Player</button>
+    <button class="btn btn-secondary w-100" onclick="markUnsold()">Mark Unsold</button>
+
+    <button class="btn btn-outline-light w-100 mt-3" onclick="adminLogout()">Logout</button>
+</div>
+
+<!-- ================= APPROVE PLAYERS ================= -->
+<div id="approvePlayers" class="section card bg-dark border-warning p-3 d-none">
+    <h3>✅ Approve Players</h3>
+    <div id="approveList"></div>
+</div>
+
+<!-- ================= RE-AUCTION ================= -->
+<div id="reauction" class="section card bg-dark border-warning p-3 d-none">
+    <h3>🔁 Unsold Players</h3>
+    <ul id="unsoldList"></ul>
+</div>
+
+<!-- ================= CREATE TEAM ================= -->
+<div id="createTeam" class="section card bg-dark border-primary p-3 d-none">
+    <h3>🏏 Create Team</h3>
+    <input id="ct_name" class="form-control mb-2" placeholder="Team Name">
+    <input id="ct_user" class="form-control mb-2" placeholder="Username">
+    <input id="ct_pass" type="password" class="form-control mb-2" placeholder="Password">
+    <input id="ct_budget" type="number" class="form-control mb-2" placeholder="Budget">
+    <button class="btn btn-primary w-100" onclick="createTeam()">Create Team</button>
+</div>
+
+</div>
+
+<script>
+const API="http://127.0.0.1:8000";
+let loggedTeam=null;
+let isAdmin=false;
+
+
+
+function show(id){
+    document.querySelectorAll(".section").forEach(s=>s.classList.add("d-none"));
+    document.getElementById(id)?.classList.remove("d-none");
+}
+
+/* ================= PLAYER ================= */
+async function registerPlayer(){
+    if(!r_name.value || !r_price.value || !r_photo.files.length){
+        regMsg.innerText = "❌ All fields including photo are required";
+        regMsg.className = "text-danger";
+        return;
+    }
+
+    const f = new FormData();
+    f.append("name", r_name.value);
+    f.append("role", r_role.value);
+    f.append("category", r_category.value);
+    f.append("base_price", r_price.value);
+    f.append("photo", r_photo.files[0]);
+
+    const res = await fetch(`${API}/players/register`, {
+        method: "POST",
+        body: f
+    });
+
+    const data = await res.json();
+
+    if(!res.ok){
+        regMsg.innerText = "❌ " + (data.detail || "Registration failed");
+        regMsg.className = "text-danger";
+        return;
+    }
+
+    regMsg.innerText = "✅ Registered! Waiting for admin approval";
+    regMsg.className = "text-success";
+
+    // reset form
+    r_name.value="";
+    r_price.value="";
+    r_photo.value="";
+
+    loadPlayers();
+}
+
+/* ================= PLAYERS ================= */
+async function loadPlayers(){
+    const data = await (await fetch(`${API}/players/all`)).json();
+    playerList.innerHTML = "";
+
+    data.forEach(p=>{
+        if(filterRole.value && p.role !== filterRole.value) return;
+        if(filterCategory.value && p.category !== filterCategory.value) return;
+
+        playerList.innerHTML += `
+<div class="col-md-3 mb-4 position-relative">
+    <div class="card player-card position-relative">
+
+        ${p.status === "sold" ? `<div class="sold-stamp">SOLD</div>` : ""}
+
+        <img src="${API}/${p.photo}" class="card-img-top">
+
+        <div class="card-body">
+            <span class="badge bg-${
+                p.status === "pending" ? "warning" :
+                p.status === "sold" ? "danger" : "success"
+            }">${p.status}</span>
+
+            <h6 class="mt-2">${p.name}</h6>
+            <small>${p.role}</small><br>
+            <small>${p.category}</small>
+
+            <!-- ✅ BASE PRICE ADDED -->
+            <div class="mt-2 fw-bold text-info">
+                💰 ₹${p.base_price}
+            </div>
+        </div>
+    </div>
+</div>`;
+    });
+}
+
+
+/* ================= LIVE ================= */
+let lastBid = 0;
+
+async function loadLive(){
+    const r = await fetch(`${API}/auction/live`);
+    if(!r.ok) return;
+
+    const d = await r.json();
+
+    livePlayer.innerText = d.current_player || "Waiting...";
+   liveTeam.innerText = d.highest_team || "-";
+liveTeam.classList.toggle("leading-team", !!d.highest_team);
+
+
+    // 🔁 Reset timer when player changes
+    if(d.current_player && d.current_player !== lastPlayer){
+        startTimer(30); // ⏱️ 30 seconds per player
+        lastPlayer = d.current_player;
+    }
+}
+function startTimer(seconds){
+    clearInterval(timerInterval);
+    auctionTime = seconds;
+    updateTimerUI();
+
+    timerInterval = setInterval(() => {
+        auctionTime--;
+        updateTimerUI();
+
+        if(auctionTime <= 0){
+            clearInterval(timerInterval);
+            auctionTimer.innerText = "TIME UP";
+            auctionTimer.classList.add("timer-danger");
+        }
+    }, 1000);
+}
+
+function updateTimerUI(){
+    auctionTimer.innerText = auctionTime;
+
+    if(auctionTime <= 5){
+        auctionTimer.classList.add("timer-danger");
+    } else {
+        auctionTimer.classList.remove("timer-danger");
+    }
+}
+
+
+
+
+
+/* ================= TEAM ================= */
+async function teamLogin(){
+    const d=await (await fetch(`${API}/teams/login?username=${teamUser.value}&password=${teamPass.value}`,{method:"POST"})).json();
+    if(!d.team_name) return teamMsg.innerText="Invalid login";
+    loggedTeam=d.team_name;
+    show("teamDashboard");
+    loadTeamDashboard();
+}
+async function loadTeamDashboard(){
+    const d=await (await fetch(`${API}/teams/dashboard?team_name=${loggedTeam}`)).json();
+    dashTeam.innerText=d.name;
+    dashBudget.innerText=d.remaining_budget;
+    dashPlayers.innerHTML=d.players.length?d.players.map(p=>`<li>${p.name} – ₹${p.price}</li>`).join(""):"<li>No players</li>";
+}
+function teamLogout(){loggedTeam=null;show("teamLogin");}
+
+async function placeBid(){
+    if(!loggedTeam){
+        alert("Login as team first");
+        return;
+    }
+
+    if(auctionTime <= 0){
+        alert("⛔ Time up! Bidding closed");
+        return;
+    }
+
+    await fetch(
+        `${API}/auction/bid?team_name=${loggedTeam}&bid_amount=${bidAmount.value}`,
+        { method:"POST" }
+    );
+}
+
+
+/* ================= ADMIN ================= */
+async function adminLogin(){
+    const r=await fetch(`${API}/admin/login?username=${adminUser.value}&password=${adminPass.value}`,{method:"POST"});
+    if(!r.ok) return;
+    isAdmin=true;
+    registerNav.classList.add("d-none");
+    show("adminDashboard");
+    loadApprove(); loadUnsold();
+}
+function adminLogout(){
+    isAdmin=false;
+    registerNav.classList.remove("d-none");
+    show("live");
+}
+
+/* ADMIN AUCTION */
+const startAuction=()=>fetch(`${API}/auction/start`,{method:"POST"});
+const setPlayerAdmin=()=>fetch(`${API}/auction/set-player?player_name=${adminPlayerName.value}`,{method:"POST"});
+const sellPlayer=()=>fetch(`${API}/auction/sell`,{method:"POST"});
+const markUnsold=()=>fetch(`${API}/auction/unsold`,{method:"POST"}).then(loadUnsold);
+
+/* APPROVE */
+async function loadApprove(){
+    const data=await (await fetch(`${API}/players/all`)).json();
+    approveList.innerHTML="";
+    data.filter(p=>p.status==="pending").forEach(p=>{
+        approveList.innerHTML+=`${p.name}
+        <button class="btn btn-sm btn-warning float-end" onclick="approve('${p.name}')">Approve</button><br>`;
+    });
+}
+const approve=n=>fetch(`${API}/players/approve?name=${n}`,{method:"POST"}).then(loadApprove);
+
+/* UNSOLD */
+async function loadUnsold(){
+    const d=await (await fetch(`${API}/auction/unsold`)).json();
+    unsoldList.innerHTML=d.map(p=>`<li>${p.name}</li>`).join("");
+}
+function enterAuction(){
+    const welcome = document.getElementById("welcome");
+    const app = document.getElementById("app");
+
+    welcome.classList.add("welcome-exit");
+
+    setTimeout(() => {
+        welcome.classList.add("d-none");
+        app.classList.remove("d-none");
+        show("live");
+    }, 600); // match exit animation time
+}
+
+
+
+
+
+
+
+/* CREATE TEAM */
+const createTeam=()=>fetch(`${API}/teams/create?name=${ct_name.value}&username=${ct_user.value}&password=${ct_pass.value}&budget=${ct_budget.value}`,{method:"POST"});
+
+
+
+setInterval(loadLive,2000);
+//show("live");
+loadLive(); loadPlayers();
+let auctionTime = 0;
+let timerInterval = null;
+let lastPlayer = null;
+
+
+let bidSound, soldSound;
+
+window.onload = () => {
+    bidSound = document.getElementById("bidSound");
+    soldSound = document.getElementById("soldSound");
+};
+
+</script>
+
+</body>
+</html>
