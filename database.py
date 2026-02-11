@@ -1,4 +1,7 @@
+import os
 from pymongo import MongoClient
 
-client = MongoClient("mongodb://localhost:27017")
+MONGO_URL = os.getenv("MONGO_URL")
+
+client = MongoClient(MONGO_URL)
 db = client["cricket_auction"]
